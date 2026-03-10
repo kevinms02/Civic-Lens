@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Space_Grotesk } from "next/font/google"; // Space Grotesk fits brutalism well!
 import "./globals.css";
 import { LanguageProvider } from "@/context/language-context";
+import { Analytics } from "@vercel/analytics/next";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const spaceGrotesk = Space_Grotesk({ subsets: ["latin"], variable: "--font-space" });
@@ -24,6 +25,7 @@ export default function RootLayout({
             <body className={`${inter.variable} ${spaceGrotesk.variable} antialiased font-sans flex min-h-screen flex-col`}>
                 <LanguageProvider>
                     {children}
+                    <Analytics />
                 </LanguageProvider>
             </body>
         </html>
