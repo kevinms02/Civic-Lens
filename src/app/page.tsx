@@ -313,15 +313,15 @@ export default function Home() {
                     <div className="md:hidden">
                         <Sheet>
                             <SheetTrigger
-                                render={<Button variant="outline" size="icon" className="brutal-button p-2 h-auto w-auto bg-foreground text-background" />}
+                                render={<Button variant="outline" size="icon" className="brutal-button p-2 h-auto w-auto !bg-black !text-white" />}
                             >
                                 <Menu size={24} />
                             </SheetTrigger>
                             <SheetContent side="top" className="!h-[100dvh] !w-[100vw] !max-w-none border-none bg-black/40 backdrop-blur-sm flex flex-col items-center justify-center [&>button]:!bg-red-500 [&>button]:!text-white [&>button]:brutal-border [&>button]:border-white [&>button]:!top-6 [&>button]:!right-6 [&>button]:scale-150 p-6">
                                 <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
                                 <div className="flex flex-col gap-8 font-black text-4xl sm:text-6xl text-center w-full max-w-sm">
-                                    <a href="/about" className="bg-primary text-black brutal-border brutal-shadow py-8 hover:-translate-y-2 hover:shadow-[10px_10px_0px_0px_rgba(0,0,0,1)] active:translate-y-0 active:shadow-none transition-all uppercase tracking-tight duration-700 animate-in slide-in-from-bottom-8 fade-in-0">{t.about}</a>
-                                    <a href="/how-it-works" className="bg-secondary text-black brutal-border brutal-shadow py-8 hover:-translate-y-2 hover:shadow-[10px_10px_0px_0px_rgba(0,0,0,1)] active:translate-y-0 active:shadow-none transition-all uppercase tracking-tight duration-1000 animate-in slide-in-from-bottom-12 fade-in-0">{t.howItWorks}</a>
+                                    <motion.a href="/about" initial={{ x: -100, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ duration: 0.5, delay: 0.1, type: "spring", bounce: 0.4 }} className="bg-primary text-black brutal-border brutal-shadow py-8 active:translate-y-0 active:shadow-none transition-transform uppercase tracking-tight">{t.about}</motion.a>
+                                    <motion.a href="/how-it-works" initial={{ x: -100, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ duration: 0.5, delay: 0.2, type: "spring", bounce: 0.4 }} className="bg-secondary text-black brutal-border brutal-shadow py-8 active:translate-y-0 active:shadow-none transition-transform uppercase tracking-tight">{t.howItWorks}</motion.a>
                                 </div>
                             </SheetContent>
                         </Sheet>
@@ -336,23 +336,23 @@ export default function Home() {
                 className="w-full max-w-5xl flex flex-col gap-16"
             >
                 {/* Hero Section */}
-                <section className="text-center sm:text-left flex flex-col sm:flex-row gap-8 items-center justify-between">
-                    <div className="max-w-2xl flex flex-col gap-6">
-                        <motion.div variants={itemVariants} className="inline-block brutal-border bg-accent px-4 py-1 w-max rotate-[-2deg] mb-2 font-bold uppercase tracking-tight text-sm sm:text-base">
+                <section className="text-center sm:text-left flex flex-col sm:flex-row gap-8 items-center justify-between w-full">
+                    <div className="max-w-2xl flex flex-col gap-6 w-full overflow-hidden sm:overflow-visible">
+                        <motion.div variants={itemVariants} className="inline-block brutal-border bg-accent px-4 py-1 w-max rotate-[-2deg] mb-2 font-bold uppercase tracking-tight text-sm sm:text-base max-w-[90vw] whitespace-normal text-left sm:text-left">
                             {t.taglineLabel}
                         </motion.div>
-                        <motion.h2 variants={itemVariants} className="text-4xl sm:text-6xl lg:text-7xl font-black uppercase leading-[1.1] tracking-tighter">
+                        <motion.h2 variants={itemVariants} className="text-4xl sm:text-6xl lg:text-7xl font-black uppercase leading-[1.1] tracking-tighter break-words overflow-hidden text-left sm:text-left">
                             {t.heroHeadline.split('policies').length > 1 ? (
                                 <>
-                                    {t.heroHeadline.split('policies')[0]} <span className="text-background bg-foreground px-2">POLICIES</span> {t.heroHeadline.split('policies')[1]}
+                                    {t.heroHeadline.split('policies')[0]} <span className="text-background bg-foreground px-2 inline-block -rotate-1">POLICIES</span> {t.heroHeadline.split('policies')[1]}
                                 </>
                             ) : t.heroHeadline.split('kebijakan').length > 1 ? (
                                 <>
-                                    {t.heroHeadline.split('kebijakan')[0]} <span className="text-background bg-foreground px-2">KEBIJAKAN</span> {t.heroHeadline.split('kebijakan')[1]}
+                                    {t.heroHeadline.split('kebijakan')[0]} <span className="text-background bg-foreground px-2 inline-block -rotate-1">KEBIJAKAN</span> {t.heroHeadline.split('kebijakan')[1]}
                                 </>
                             ) : t.heroHeadline}
                         </motion.h2>
-                        <motion.p variants={itemVariants} className="text-lg sm:text-xl font-medium max-w-xl border-l-4 border-foreground pl-4">
+                        <motion.p variants={itemVariants} className="text-lg sm:text-xl font-medium max-w-xl border-l-4 border-foreground pl-4 break-words text-left text-pretty pr-2 sm:pr-0">
                             {t.heroSubHeadline}
                         </motion.p>
                     </div>
