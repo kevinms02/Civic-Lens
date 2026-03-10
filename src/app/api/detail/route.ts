@@ -3,9 +3,8 @@ import { Groq } from 'groq-sdk';
 
 export const maxDuration = 60;
 
-const GROQ_API_KEY = process.env.GROQ_API_KEY;
-
 export async function POST(req: Request) {
+    const GROQ_API_KEY = process.env.GROQ_API_KEY;
     if (!GROQ_API_KEY) {
         return NextResponse.json({ error: 'GROQ_API_KEY is not configured.' }, { status: 500 });
     }
