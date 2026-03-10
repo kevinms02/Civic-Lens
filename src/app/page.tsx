@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
@@ -10,6 +10,12 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { UploadCloud, Search, AlertCircle, Menu, Globe, Instagram, Loader2, ArrowLeft, ArrowRight, FileText } from "lucide-react";
 import { useLanguage } from "@/context/language-context";
 import { motion, AnimatePresence, Variants } from "framer-motion";
+import * as pdfjsLib from 'pdfjs-dist';
+
+// Initialize PDF.js worker
+if (typeof window !== 'undefined') {
+    pdfjsLib.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
+}
 
 const renderMarkdown = (text: string) => {
     const lines = text.split('\n');
@@ -83,6 +89,7 @@ export default function Home() {
 
     // File upload state
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [pdfExtractedText, setPdfExtractedText] = useState<string>(""); // Cache for extracted PDF text
     const [isDragging, setIsDragging] = useState(false);
 
     const handleTranslate = async () => {
@@ -95,25 +102,41 @@ export default function Home() {
         setActiveCardTab('tldr');
 
         try {
-            // Validation: Minimum 200 characters if no file is selected
-            if (!selectedFile && policyText.trim().length < 200) {
+            let finalOutputText = policyText;
+
+            // Client-side PDF Extraction
+            if (selectedFile) {
+                if (!pdfExtractedText) {
+                    const arrayBuffer = await selectedFile.arrayBuffer();
+                    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                    let extracted = "";
+                    for (let i = 1; i <= pdf.numPages; i++) {
+                        const page = await pdf.getPage(i);
+                        const textContent = await page.getTextContent();
+                        extracted += textContent.items.map((item: any) => item.str).join(" ") + "\n";
+                    }
+                    setPdfExtractedText(extracted);
+                    finalOutputText = extracted;
+                } else {
+                    finalOutputText = pdfExtractedText;
+                }
+            }
+
+            // Validation: Minimum 200 characters
+            if (finalOutputText.trim().length < 200) {
                 setErrorMsg(t.errorModal.tooShort);
+                setShowResult(false);
                 return;
             }
 
             const formData = new FormData();
             formData.append('jobType', jobType === 'other' ? customJob : jobType);
             formData.append('language', lang);
-
-            if (selectedFile) {
-                formData.append('file', selectedFile);
-            } else {
-                formData.append('text', policyText);
-            }
+            formData.append('text', finalOutputText); // Only sending text now!
 
             const response = await fetch('/api/analyze', {
                 method: 'POST',
-                body: formData,
+                body: formData, // Much smaller payload avoids Vercel 4.5MB limit
             });
 
             if (!response.ok) {
@@ -141,20 +164,20 @@ export default function Home() {
     };
 
     const handleExplainDetail = async () => {
-        if (!policyText.trim() && !apiResult) return;
+        if (!policyText.trim() && !apiResult && !selectedFile) return;
         if (detailContent) return;
 
         setIsDetailLoading(true);
         try {
+            let finalOutputText = policyText;
+            if (selectedFile) {
+                finalOutputText = pdfExtractedText; // Use cached text
+            }
+
             const formData = new FormData();
             formData.append('jobType', jobType === 'other' ? customJob : jobType);
             formData.append('language', lang);
-
-            if (selectedFile) {
-                formData.append('file', selectedFile);
-            } else {
-                formData.append('text', policyText);
-            }
+            formData.append('text', finalOutputText); // Only send text
 
             const response = await fetch('/api/detail', {
                 method: 'POST',

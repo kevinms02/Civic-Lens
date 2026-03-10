@@ -12,27 +12,11 @@ export async function POST(req: Request) {
 
     try {
         const formData = await req.formData();
-        const text = formData.get('text') as string;
-        const file = formData.get('file') as File;
+        const policyTextToAnalyze = formData.get('text') as string;
         const jobType = formData.get('jobType') as string;
         const language = formData.get('language') as string;
 
-        let policyTextToAnalyze = text || "";
-
-        if (file) {
-            if (file.type === "application/pdf") {
-                const arrayBuffer = await file.arrayBuffer();
-                const buffer = Buffer.from(arrayBuffer);
-                const { PDFParse } = require('pdf-parse');
-                const pdfParser = new PDFParse({ data: buffer });
-                const pdfData = await pdfParser.getText();
-                policyTextToAnalyze = pdfData.text;
-            } else {
-                return NextResponse.json({ error: 'Unsupported file type.' }, { status: 400 });
-            }
-        }
-
-        if (!policyTextToAnalyze.trim()) {
+        if (!policyTextToAnalyze || !policyTextToAnalyze.trim()) {
             return NextResponse.json({ error: 'No text provided.' }, { status: 400 });
         }
 
