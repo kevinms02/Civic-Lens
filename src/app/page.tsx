@@ -10,12 +10,6 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { UploadCloud, Search, AlertCircle, Menu, Globe, Instagram, Loader2, ArrowLeft, ArrowRight, FileText } from "lucide-react";
 import { useLanguage } from "@/context/language-context";
 import { motion, AnimatePresence, Variants } from "framer-motion";
-import * as pdfjsLib from 'pdfjs-dist';
-
-// Initialize PDF.js worker
-if (typeof window !== 'undefined') {
-    pdfjsLib.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
-}
 
 const renderMarkdown = (text: string) => {
     const lines = text.split('\n');
@@ -107,6 +101,10 @@ export default function Home() {
             // Client-side PDF Extraction
             if (selectedFile) {
                 if (!pdfExtractedText) {
+                    // Dynamically import pdfjs-dist only on the client-side
+                    const pdfjsLib = await import('pdfjs-dist');
+                    pdfjsLib.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
+
                     const arrayBuffer = await selectedFile.arrayBuffer();
                     const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
                     let extracted = "";
